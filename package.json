@@ -1,0 +1,12 @@
+{
+  "name": "missionary-help",
+  "version": "0.0.1",
+  "description": "help",
+  "main": "resources/main.js",
+  "scripts": {
+    "dev": "shadow-cljs watch main renderer"
+  },
+  "dependencies": {
+    "shadow-cljs": "^2.16.12"
+  }
+}

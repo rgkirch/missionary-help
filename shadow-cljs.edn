@@ -1,0 +1,12 @@
+{:source-paths ["src"]
+
+ :dependencies [[missionary/missionary "b.27-SNAPSHOT"]]
+
+ :dev-http {8080 "resources/public/"}
+
+ :builds {:renderer {:target :browser
+                     :output-dir "resources/public/js"
+                     :asset-path "js"
+                     :modules {:renderer {:init-fn mh/start!}}}}
+
+ :jvm-opts ["-Xmx4G"]}
