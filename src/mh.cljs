@@ -39,15 +39,15 @@
                                      (let [disabled (not (mi/?< valid?))]
                                        (gdom/setProperties node (clj->js {:disabled disabled})))))))
           input-node (gdom/createDom "input" (clj->js {:type "text"}))]
+      ;; begin different code
       (mi/stream!
        (mi/ap (let [x (mi/?< (observe-event button-node "click"))]
                 (println (.-pointerType x) "clicked: text is" (mi/?< (mi/eduction (take 1) field))))))
-      ;; begin different code
+      ;; end different code
       (mi/stream!
        (mi/ap
         (let [x (mi/?< (observe-event input-node "input"))]
           (reset! db (.. x -target -value)))))
-      ;; end different code
       (gdom/replaceNode
        (gdom/createDom "div" (clj->js {:id "app-container"})
                        (gdom/createDom "div" nil input-node)
@@ -69,17 +69,17 @@
                                    (let [disabled (not (mi/?< valid?))]
                                      (gdom/setProperties node (clj->js {:disabled disabled})))))))
         input-node (gdom/createDom "input" (clj->js {:type "text"}))]
+    ;; begin different code
     (mi/stream!
      (mi/ap
       (let [func (fn [x]
                    (println (.-pointerType x) "clicked: text is" (mi/?< (mi/eduction (take 1) field))))]
         (func (mi/?< (observe-event button-node "click"))))))
-    ;; begin different code
+    ;; end different code
     (mi/stream!
      (mi/ap
       (let [x (mi/?< (observe-event input-node "input"))]
         (reset! db (.. x -target -value)))))
-    ;; end different code
     (gdom/replaceNode
      (gdom/createDom "div" (clj->js {:id "app-container"})
                      (gdom/createDom "div" nil input-node)
