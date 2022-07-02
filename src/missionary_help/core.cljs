@@ -43,6 +43,16 @@
   (fn pub! [k flow]
     (swap! switchboard assoc k flow)))
 
+(defn Text
+  [flow]
+  (doto (gdom/createTextNode)
+    (as-> node
+      ((m/sp
+        (m/? (m/reduce (fn [_ text] (set! (.-textContent node) (str text)))
+                       nil
+                       flow)))
+       (.-log js/console) (.-error js/console)))))
+
 (defn ^:dev/after-load start!
   []
   (when @dispose!
@@ -51,16 +61,12 @@
           ((m/reactor
             (let [switchboard (atom {})
                   sub (mksub switchboard)
-                  pub! (mkpub switchboard)]
+                  pub! (mkpub switchboard)
+                  click-count (->> (sub :clicks)
+                                   (m/eduction (map (constantly 1)))
+                                   (m/reductions + 0))]
               (-> (gdom/createDom "div" (clj->js {:id "root"})
-                                  (doto (gdom/createTextNode)
-                                    (as-> node
-                                      ((m/sp
-                                        (let [clicks (sub :clicks)]
-                                          (m/? (m/reduce (fn [_ count] (set! (.-textContent node) (str count)))
-                                                         nil
-                                                         (m/reductions + 0 (m/eduction (map (constantly 1)) clicks))))))
-                                       (.-log js/console) (.-error js/console))))
+                                  (Text click-count)
                                   (doto (gdom/createDom "input" (clj->js {:type "button"
                                                                           :value "Click me."}))
                                     (as-> node
