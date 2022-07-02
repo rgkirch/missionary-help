@@ -29,21 +29,34 @@
 
 (defonce dispose! (atom nil))
 
+(defn mksub
+  [switchboard]
+  (fn sub [k]
+    (m/ap
+     (let [flow (m/?> (->> (observe-ref switchboard)
+                           (m/eduction (filter #(contains? % k)))
+                           (m/eduction (map k))))]
+       (m/?> flow)))))
+
+(defn mkpub
+  [switchboard]
+  (fn pub! [k flow]
+    (swap! switchboard assoc k flow)))
+
 (defn ^:dev/after-load start!
   []
   (when @dispose!
     (@dispose!))
   (reset! dispose!
           ((m/reactor
-            (let [switchboard (atom {})]
+            (let [switchboard (atom {})
+                  sub (mksub switchboard)
+                  pub! (mkpub switchboard)]
               (-> (gdom/createDom "div" (clj->js {:id "root"})
                                   (doto (gdom/createTextNode)
                                     (as-> node
                                       ((m/sp
-                                        (let [clicks (m/? (->> (observe-ref switchboard)
-                                                               (m/eduction (filter #(contains? % :clicks)))
-                                                               (m/eduction (map :clicks))
-                                                               (m/reduce (comp reduced {}) nil)))]
+                                        (let [clicks (sub :clicks)]
                                           (m/? (m/reduce (fn [_ count] (set! (.-textContent node) (str count)))
                                                          nil
                                                          (m/reductions + 0 (m/eduction (map (constantly 1)) clicks))))))
@@ -51,7 +64,7 @@
                                   (doto (gdom/createDom "input" (clj->js {:type "button"
                                                                           :value "Click me."}))
                                     (as-> node
-                                      (swap! switchboard assoc :clicks (observe-event node "click")))))
+                                      (pub! :clicks (observe-event node "click")))))
                   (gdom/replaceNode
                    (gdom/getElement "root")))))
            (.-log js/console) (.-error js/console))))
