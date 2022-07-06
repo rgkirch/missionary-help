@@ -4,7 +4,9 @@
                 [com.hyperfiddle/rcf "20220405"]
                 [missionary/missionary "b.27-SNAPSHOT"]
                 [hashp "0.1.1"]
-                [philoskim/debux "0.8.2"]]
+                [philoskim/debux "0.8.2"]
+                [meander/epsilon "0.0.650"]
+                [tick/tick "0.5.0-RC6"]]
 
  :dev-http {8080 "resources/public/"}
 
